@@ -1,0 +1,52 @@
+# Builds the Electron desktop app on Windows, macOS and Linux.
+# Run it from the Actions tab, or push a tag like v1.0.0 to also attach the builds to a GitHub Release.
+name: Build desktop app
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: --win
+          - os: macos-latest
+            target: --mac
+          - os: ubuntu-22.04
+            target: --linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx electron-builder ${{ matrix.target }} --publish never
+        env:
+          # Unsigned builds: don't try to find a signing identity on the runner.
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RemoteMouse-${{ runner.os }}
+          path: |
+            dist/RemoteMouse-*
+            !dist/*.blockmap
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/RemoteMouse-*.dmg
+            dist/RemoteMouse-*.zip
+            dist/RemoteMouse-*.exe
+            dist/RemoteMouse-*.AppImage
+            dist/RemoteMouse-*.deb

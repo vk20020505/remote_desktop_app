@@ -1,0 +1,95 @@
+{
+  "name": "remote-mouse",
+  "productName": "Remote Mouse",
+  "version": "1.0.0",
+  "description": "Control this computer from your phone",
+  "main": "src/main.js",
+  "author": "Techtonic",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux"
+  },
+  "dependencies": {
+    "@nut-tree-fork/nut-js": "4.2.6"
+  },
+  "devDependencies": {
+    "electron": "44.4.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.techtonic.remotemouse",
+    "productName": "Remote Mouse",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "artifactName": "RemoteMouse-${version}-${os}-${arch}.${ext}",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "extendInfo": {
+        "NSAppleEventsUsageDescription": "Remote Mouse uses System Events to list and switch apps and to shut down or restart from your phone."
+      }
+    },
+    "dmg": {
+      "title": "Remote Mouse"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Remote Mouse"
+    },
+    "portable": {
+      "artifactName": "RemoteMouse-${version}-portable.${ext}"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility",
+      "synopsis": "Control this computer from your phone",
+      "maintainer": "Techtonic"
+    }
+  }
+}

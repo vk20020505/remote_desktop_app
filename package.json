@@ -1,16 +1,16 @@
 {
-  "name": "remote-mouse",
-  "productName": "Remote Mouse",
+  "name": "mouselink-desktop",
+  "productName": "Mouselink Desktop",
   "version": "1.0.0",
   "description": "Control this computer from your phone",
   "main": "src/main.js",
-  "author": "Techtonic",
+  "author": "Vynova Labs",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder",
-    "dist:mac": "electron-builder --mac",
+    "dist:mac": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac",
     "dist:win": "electron-builder --win",
     "dist:linux": "electron-builder --linux"
   },
@@ -22,8 +22,8 @@
     "electron-builder": "26.15.3"
   },
   "build": {
-    "appId": "com.techtonic.remotemouse",
-    "productName": "Remote Mouse",
+    "appId": "com.app.mouselinkdesktop",
+    "productName": "Mouselink Desktop",
     "files": [
       "src/**/*",
       "package.json"
@@ -32,7 +32,7 @@
       "buildResources": "build",
       "output": "dist"
     },
-    "artifactName": "RemoteMouse-${version}-${os}-${arch}.${ext}",
+    "artifactName": "Mouselink-Desktop-${version}-${os}-${arch}.${ext}",
     "mac": {
       "category": "public.app-category.utilities",
       "target": [
@@ -52,11 +52,11 @@
         }
       ],
       "extendInfo": {
-        "NSAppleEventsUsageDescription": "Remote Mouse uses System Events to list and switch apps and to shut down or restart from your phone."
+        "NSAppleEventsUsageDescription": "Mouselink Desktop uses System Events to list and switch apps and to shut down or restart from your phone."
       }
     },
     "dmg": {
-      "title": "Remote Mouse"
+      "title": "Mouselink Desktop"
     },
     "win": {
       "target": [
@@ -77,10 +77,10 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Remote Mouse"
+      "shortcutName": "Mouselink Desktop"
     },
     "portable": {
-      "artifactName": "RemoteMouse-${version}-portable.${ext}"
+      "artifactName": "Mouselink-Desktop-${version}-portable.${ext}"
     },
     "linux": {
       "target": [
@@ -89,7 +89,7 @@
       ],
       "category": "Utility",
       "synopsis": "Control this computer from your phone",
-      "maintainer": "Techtonic"
+      "maintainer": "Vynova Labs"
     }
   }
 }

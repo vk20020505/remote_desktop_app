@@ -1,6 +1,6 @@
 {
   "name": "mouselink-desktop",
-  "productName": "Mouselink Desktop",
+  "productName": "MouseLink Desktop",
   "version": "1.0.0",
   "description": "Control this computer from your phone",
   "main": "src/main.js",
@@ -10,7 +10,7 @@
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder",
-    "dist:mac": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac",
+    "dist:mac": "electron-builder --mac",
     "dist:win": "electron-builder --win",
     "dist:linux": "electron-builder --linux"
   },
@@ -23,7 +23,7 @@
   },
   "build": {
     "appId": "com.app.mouselinkdesktop",
-    "productName": "Mouselink Desktop",
+    "productName": "MouseLink Desktop",
     "files": [
       "src/**/*",
       "package.json"
@@ -32,9 +32,13 @@
       "buildResources": "build",
       "output": "dist"
     },
-    "artifactName": "Mouselink-Desktop-${version}-${os}-${arch}.${ext}",
+    "artifactName": "MouseLink-Desktop-${version}-${os}-${arch}.${ext}",
     "mac": {
       "category": "public.app-category.utilities",
+      "identity": "-",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
       "target": [
         {
           "target": "dmg",
@@ -52,11 +56,11 @@
         }
       ],
       "extendInfo": {
-        "NSAppleEventsUsageDescription": "Mouselink Desktop uses System Events to list and switch apps and to shut down or restart from your phone."
+        "NSAppleEventsUsageDescription": "MouseLink Desktop uses System Events to list and switch apps and to shut down or restart from your phone."
       }
     },
     "dmg": {
-      "title": "Mouselink Desktop"
+      "title": "MouseLink Desktop"
     },
     "win": {
       "target": [
@@ -77,10 +81,10 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Mouselink Desktop"
+      "shortcutName": "MouseLink Desktop"
     },
     "portable": {
-      "artifactName": "Mouselink-Desktop-${version}-portable.${ext}"
+      "artifactName": "MouseLink-Desktop-${version}-portable.${ext}"
     },
     "linux": {
       "target": [

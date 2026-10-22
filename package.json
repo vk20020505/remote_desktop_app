@@ -1,6 +1,6 @@
 {
   "name": "mouselink-desktop",
-  "productName": "Mouselink Desktop",
+  "productName": "MouseLink Desktop",
   "version": "1.0.0",
   "description": "Control this computer from your phone",
   "main": "src/main.js",
@@ -12,6 +12,7 @@
     "dist": "electron-builder",
     "dist:mac": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac",
     "dist:win": "electron-builder --win",
+    "dist:msix": "electron-builder --win appx",
     "dist:linux": "electron-builder --linux"
   },
   "dependencies": {
@@ -23,7 +24,7 @@
   },
   "build": {
     "appId": "com.app.mouselinkdesktop",
-    "productName": "Mouselink Desktop",
+    "productName": "MouseLink Desktop",
     "files": [
       "src/**/*",
       "package.json"
@@ -32,7 +33,7 @@
       "buildResources": "build",
       "output": "dist"
     },
-    "artifactName": "Mouselink-Desktop-${version}-${os}-${arch}.${ext}",
+    "artifactName": "MouseLink-Desktop-${version}-${os}-${arch}.${ext}",
     "mac": {
       "category": "public.app-category.utilities",
       "target": [
@@ -52,11 +53,11 @@
         }
       ],
       "extendInfo": {
-        "NSAppleEventsUsageDescription": "Mouselink Desktop uses System Events to list and switch apps and to shut down or restart from your phone."
+        "NSAppleEventsUsageDescription": "MouseLink Desktop uses System Events to list and switch apps and to shut down or restart from your phone."
       }
     },
     "dmg": {
-      "title": "Mouselink Desktop"
+      "title": "MouseLink Desktop"
     },
     "win": {
       "target": [
@@ -71,16 +72,35 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "appx",
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Mouselink Desktop"
+      "shortcutName": "MouseLink Desktop"
     },
     "portable": {
-      "artifactName": "Mouselink-Desktop-${version}-portable.${ext}"
+      "artifactName": "MouseLink-Desktop-${version}-portable.${ext}"
+    },
+    "appx": {
+      "applicationId": "MouseLink",
+      "identityName": "VynovaLabs.MouseLinkDesktop",
+      "publisher": "CN=Vynova Labs",
+      "publisherDisplayName": "Vynova Labs",
+      "displayName": "MouseLink Desktop",
+      "backgroundColor": "transparent",
+      "showNameOnTiles": true,
+      "languages": [
+        "en-US"
+      ],
+      "artifactName": "MouseLink-Desktop-${version}-${arch}.msix"
     },
     "linux": {
       "target": [

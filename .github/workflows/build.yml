@@ -36,17 +36,18 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
       - uses: actions/upload-artifact@v4
         with:
-          name: RemoteMouse-${{ runner.os }}
+          name: Mouselink-Desktop-${{ runner.os }}
           path: |
-            dist/RemoteMouse-*
+            dist/Mouselink-Desktop-*
             !dist/*.blockmap
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/RemoteMouse-*.dmg
-            dist/RemoteMouse-*.zip
-            dist/RemoteMouse-*.exe
-            dist/RemoteMouse-*.AppImage
-            dist/RemoteMouse-*.deb
+            dist/Mouselink-Desktop-*.dmg
+            dist/Mouselink-Desktop-*.zip
+            dist/Mouselink-Desktop-*.exe
+            dist/Mouselink-Desktop-*.msix
+            dist/Mouselink-Desktop-*.AppImage
+            dist/Mouselink-Desktop-*.deb

@@ -78,7 +78,7 @@ function renderDevices(clients) {
       el("div", { class: "empty-icon" }, icon("phone")),
       el("h3", {}, state.running ? "Waiting for your phone" : "Server is off"),
       el("p", {}, state.running
-        ? `Open Remote Mouse on your phone and connect to ${state.ip}.`
+        ? `Open MouseLink on your phone and connect to ${state.ip}.`
         : "Start the server from the Overview page to accept connections.")));
     return;
   }
@@ -102,7 +102,7 @@ function render(s) {
   $("#hero").classList.toggle("on", on);
   $("#hero-title").textContent = on ? (n ? `${n} device${n > 1 ? "s" : ""} connected` : "Ready to connect") : "Server is off";
   $("#hero-sub").textContent = on
-    ? (n ? "Your phone is in control. Have fun!" : "Open Remote Mouse on your phone to get started.")
+    ? (n ? "Your phone is in control. Have fun!" : "Open MouseLink on your phone to get started.")
     : "Turn it on to let your phone connect.";
   const btn = $("#toggle-server");
   btn.className = `btn btn-lg ${on ? "btn-danger" : "btn-primary"}`;
@@ -141,7 +141,7 @@ function render(s) {
     $("#password").value = s.settings.password;
     $("#port-input").value = s.settings.port;
     $("#login-setting").hidden = !s.canOpenAtLogin;
-    $("#about").textContent = `Remote Mouse ${s.version} · ${{ darwin: "macOS", win32: "Windows", linux: "Linux" }[s.platform] || s.platform}`;
+    $("#about").textContent = `MouseLink ${s.version} · ${{ darwin: "macOS", win32: "Windows", linux: "Linux" }[s.platform] || s.platform}`;
     settingsLoaded = true;
   }
   $$("[data-setting]").forEach((cb) => { cb.checked = !!s.settings[cb.dataset.setting]; });

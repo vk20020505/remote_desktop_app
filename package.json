@@ -100,6 +100,8 @@
       "languages": [
         "en-US"
       ],
+      "minVersion": "10.0.17763.0",
+      "maxVersionTested": "10.0.22621.0",
       "artifactName": "MouseLink-Desktop-${version}-${arch}.msix"
     },
     "linux": {

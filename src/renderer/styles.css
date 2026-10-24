@@ -72,6 +72,7 @@ body.platform-darwin .sidebar { background: transparent; }
 body.platform-darwin .content { background: var(--bg); }
 
 svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.icon-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 button { font: inherit; color: inherit; cursor: pointer; }
 h1, h2, h3, p { margin: 0; }
 [hidden] { display: none !important; }
@@ -370,9 +371,3 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 
 
 
-PS D:\remote_desktop_app> npx electron . --enable-logging
-
-(node:9488) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `electron --trace-deprecation ...` to show where the warning was created)
-[9488:1024/225326.060:INFO:CONSOLE:12] "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-/3kWSXHts8LrwfemLzY9W0tOv5I4eLIhrf0pT8cU0WI='), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The action has been blocked.", source: file:///D:/remote_desktop_app/src/renderer/index.html (12)
-D:\remote_desktop_app\node_modules\electron\dist\electron.exe exited with signal SIGINT

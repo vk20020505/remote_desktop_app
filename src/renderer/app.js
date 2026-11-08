@@ -4,6 +4,7 @@ const $$ = (sel) => [...document.querySelectorAll(sel)];
 
 let state = null;
 let settingsLoaded = false;
+let qrUrl = null;
 
 document.body.classList.add(`platform-${api.platform}`);
 
@@ -78,7 +79,7 @@ function renderDevices(clients) {
       el("div", { class: "empty-icon" }, icon("phone")),
       el("h3", {}, state.running ? "Waiting for your phone" : "Server is off"),
       el("p", {}, state.running
-        ? `Open Remote Mouse on your phone and connect to ${state.ip}.`
+        ? `Open MouseLink Mobile app on your phone and connect to ${state.ip}.`
         : "Start the server from the Overview page to accept connections.")));
     return;
   }
@@ -102,7 +103,7 @@ function render(s) {
   $("#hero").classList.toggle("on", on);
   $("#hero-title").textContent = on ? (n ? `${n} device${n > 1 ? "s" : ""} connected` : "Ready to connect") : "Server is off";
   $("#hero-sub").textContent = on
-    ? (n ? "Your phone is in control. Have fun!" : "Open Remote Mouse on your phone to get started.")
+    ? (n ? "Your phone is in control. Have fun!" : "Open MouseLink mobile app on your phone to get started.")
     : "Turn it on to let your phone connect.";
   const btn = $("#toggle-server");
   btn.className = `btn btn-lg ${on ? "btn-danger" : "btn-primary"}`;
@@ -111,10 +112,19 @@ function render(s) {
   // Address
   $("#ip").textContent = s.ip;
   $("#port").textContent = s.port;
+  $("#other-ips").hidden = !s.otherIps.length;
+  $("#other-ips").textContent = `Also on this computer: ${s.otherIps.join(", ")}`;
   $("#hostname").textContent = s.hostname;
   const secure = !!s.settings.password;
   $("#security-chip").classList.toggle("secure", secure);
   $("#security-chip span").textContent = secure ? "Password protected" : "No password";
+
+  // QR code — only regenerate when the link actually changes (IP, port, name or password).
+  $("#qr").classList.toggle("off", !on);
+  if (s.connectUrl !== qrUrl) {
+    qrUrl = s.connectUrl;
+    api.qrCode(qrUrl).then((src) => { if (qrUrl === s.connectUrl) $("#qr-img").src = src; });
+  }
 
   // Sidebar
   $("#sidebar-status").classList.toggle("on", on);
@@ -141,7 +151,7 @@ function render(s) {
     $("#password").value = s.settings.password;
     $("#port-input").value = s.settings.port;
     $("#login-setting").hidden = !s.canOpenAtLogin;
-    $("#about").textContent = `Remote Mouse ${s.version} · ${{ darwin: "macOS", win32: "Windows", linux: "Linux" }[s.platform] || s.platform}`;
+    $("#about").textContent = `MouseLink Desktop ${s.version} · ${{ darwin: "macOS", win32: "Windows", linux: "Linux" }[s.platform] || s.platform}`;
     settingsLoaded = true;
   }
   $$("[data-setting]").forEach((cb) => { cb.checked = !!s.settings[cb.dataset.setting]; });

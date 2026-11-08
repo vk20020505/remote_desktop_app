@@ -13,19 +13,60 @@ const DEFAULT_PORT = 12345;
 const DISCOVERY_PORT = 12346;
 const DISCOVERY_REQUEST = "REMOTE_MOUSE_DISCOVER";
 
-function getLocalIp() {
-  // Prefer a private LAN address (Wi-Fi/Ethernet) over VPN/virtual adapters.
-  const candidates = [];
+// Virtual adapters (VMs, containers, VPNs) have LAN-looking IPs a phone can never reach.
+// Windows often names them "Ethernet 2", so the name alone is not enough: also check the
+// MAC vendor prefix and well-known default subnets.
+const VIRTUAL_NAME = /vbox|virtualbox|vmnet|vmware|hyper-?v|vethernet|wsl|docker|veth|br-|virbr|utun|tun|tap|zt|tailscale|wireguard|wg\d|parallels|bluetooth|loopback|npcap|hamachi/i;
+const VIRTUAL_MAC = [
+  "0a:00:27", "08:00:27",                         // VirtualBox
+  "00:50:56", "00:0c:29", "00:05:69", "00:1c:14", // VMware
+  "00:15:5d",                                     // Hyper-V / WSL
+  "02:42:",                                       // Docker
+  "00:1c:42",                                     // Parallels
+  "00:03:ff",                                     // Virtual PC
+];
+const VIRTUAL_SUBNET = /^(192\.168\.56\.|192\.168\.99\.|172\.17\.|172\.18\.)/; // VirtualBox, docker-machine, Docker
+const LAN = /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/;
+
+function isVirtual(name, a) {
+  const mac = (a.mac || "").toLowerCase();
+  return VIRTUAL_NAME.test(name) || VIRTUAL_MAC.some((p) => mac.startsWith(p)) || VIRTUAL_SUBNET.test(a.address);
+}
+
+/** All usable IPv4 addresses, best first: real LAN > other real > virtual. */
+function listLocalIps() {
+  const out = [];
   for (const [name, addrs] of Object.entries(os.networkInterfaces())) {
     for (const a of addrs || []) {
-      if (a.family !== "IPv4" || a.internal) continue;
-      const lan = /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(a.address);
-      const virtual = /vbox|vmnet|docker|veth|utun|tun|tap|br-|virtual|vethernet|wsl/i.test(name);
-      candidates.push({ address: a.address, score: (lan ? 2 : 0) + (virtual ? 0 : 1) });
+      if (a.family !== "IPv4" && a.family !== 4) continue;
+      if (a.internal || a.address.startsWith("169.254.")) continue; // loopback / no DHCP
+      const virtual = isVirtual(name, a);
+      out.push({ address: a.address, name, virtual, score: (virtual ? 0 : 4) + (LAN.test(a.address) ? 2 : 0) });
     }
   }
-  candidates.sort((a, b) => b.score - a.score);
-  return candidates[0] ? candidates[0].address : "127.0.0.1";
+  return out.sort((x, y) => y.score - x.score);
+}
+
+// The address the OS would use to reach the outside world is the real Wi-Fi/Ethernet one.
+// A connected UDP socket picks a route without sending any packet.
+let routedIp = null;
+function refreshRoutedIp() {
+  const sock = dgram.createSocket("udp4");
+  const done = () => { try { sock.close(); } catch (_) { /* closed */ } };
+  sock.on("error", () => { routedIp = null; done(); });
+  sock.connect(53, "8.8.8.8", () => {
+    try { routedIp = sock.address().address; } catch (_) { routedIp = null; }
+    done();
+  });
+}
+refreshRoutedIp();
+setInterval(refreshRoutedIp, 5000).unref();
+
+function getLocalIp() {
+  const ips = listLocalIps();
+  const routed = ips.find((c) => c.address === routedIp && !c.virtual);
+  if (routed) return routed.address;
+  return ips[0] ? ips[0].address : "127.0.0.1";
 }
 
 const sha = (s) => crypto.createHash("sha256").update(s, "utf8").digest();
@@ -180,4 +221,4 @@ function coalesceMoves(batch) {
   return out;
 }
 
-module.exports = { RemoteServer, getLocalIp, DEFAULT_PORT };
+module.exports = { RemoteServer, getLocalIp, listLocalIps, DEFAULT_PORT };

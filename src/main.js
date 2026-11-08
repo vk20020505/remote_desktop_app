@@ -5,7 +5,9 @@ const {
   app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, nativeTheme, clipboard, shell,
   systemPreferences, Notification,
 } = require("electron");
-const { RemoteServer, getLocalIp, DEFAULT_PORT } = require("./server");
+const QRCode = require("qrcode");
+const { RemoteServer, getLocalIp, listLocalIps, DEFAULT_PORT } = require("./server");
+const { OS_NAME } = require("./controls");
 
 const IS_MAC = process.platform === "darwin";
 const IS_WIN = process.platform === "win32";
@@ -47,13 +49,31 @@ function accessibilityGranted() {
   return IS_MAC ? systemPreferences.isTrustedAccessibilityClient(false) : true;
 }
 
+/**
+ * Link the phone app reads from the QR code, e.g.
+ *   remotemouse://connect?host=192.168.1.20&port=12345&name=My-Mac&os=Darwin&password=secret
+ * `password` is only present when one is set, so scanning connects without typing anything.
+ */
+function connectUrl() {
+  const params = new URLSearchParams({
+    host: getLocalIp(),
+    port: String(server.running ? server.port : settings.port),
+    name: os.hostname(),
+    os: OS_NAME,
+  });
+  if (settings.password) params.set("password", settings.password);
+  return `remotemouse://connect?${params}`;
+}
+
 function state() {
   return {
+    connectUrl: connectUrl(),
     running: server.running,
     startedAt: server.startedAt,
     commandCount: server.commandCount,
     port: server.running ? server.port : settings.port,
     ip: getLocalIp(),
+    otherIps: listLocalIps().filter((c) => !c.virtual && c.address !== getLocalIp()).map((c) => c.address),
     hostname: os.hostname(),
     platform: process.platform,
     version: app.getVersion(),
@@ -86,7 +106,7 @@ async function startServer() {
     return { ok: true };
   } catch (e) {
     const message = e.code === "EADDRINUSE"
-      ? `Port ${settings.port} is already in use. Another copy of MouseLink may be running — or pick a different port in Settings.`
+      ? `Port ${settings.port} is already in use. Another copy of MouseLink Desktop may be running — or pick a different port in Settings.`
       : e.message;
     log(`Could not start: ${message}`);
     return { ok: false, error: message };
@@ -131,7 +151,7 @@ function createWindow() {
     win.hide();
     if (IS_MAC) app.dock.hide();
     if (!trayHintShown && Notification.isSupported()) {
-      new Notification({ title: "MouseLink is still running",
+      new Notification({ title: "Remote Mouse is still running",
         body: "Your phone stays connected. Use the menu bar / tray icon to open or quit." }).show();
       trayHintShown = true;
     }
@@ -171,11 +191,11 @@ function updateTray() {
   const status = server.running
     ? `Running on ${getLocalIp()}:${server.port}${n ? ` · ${n} connected` : ""}`
     : "Server stopped";
-  tray.setToolTip(`MouseLink — ${status}`);
+  tray.setToolTip(`MouseLink Desktop — ${status}`);
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: status, enabled: false },
     { type: "separator" },
-    { label: "Open MouseLink", click: showWindow },
+    { label: "Open MouseLink Desktop", click: showWindow },
     { label: server.running ? "Stop Server" : "Start Server",
       click: () => (server.running ? server.stop() : startServer()) },
     { type: "separator" },
@@ -204,6 +224,9 @@ ipcMain.handle("update-settings", (_e, patch) => {
   pushState();
   return state();
 });
+ipcMain.handle("qr-code", (_e, text) =>
+  QRCode.toDataURL(String(text), { errorCorrectionLevel: "M", margin: 1, width: 360,
+    color: { dark: "#141824", light: "#ffffff" } }));
 ipcMain.handle("disconnect", (_e, id) => server.disconnect(id));
 ipcMain.handle("copy-text", (_e, text) => clipboard.writeText(String(text)));
 ipcMain.handle("clear-log", () => { logs.length = 0; pushState(); });

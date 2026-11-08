@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld("remote", {
   getState: () => ipcRenderer.invoke("get-state"),
   toggleServer: () => ipcRenderer.invoke("toggle-server"),
   updateSettings: (patch) => ipcRenderer.invoke("update-settings", patch),
+  qrCode: (text) => ipcRenderer.invoke("qr-code", text),
   disconnect: (id) => ipcRenderer.invoke("disconnect", id),
   copyText: (text) => ipcRenderer.invoke("copy-text", text),
   clearLog: () => ipcRenderer.invoke("clear-log"),

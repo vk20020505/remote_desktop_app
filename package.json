@@ -1,7 +1,7 @@
 {
   "name": "mouselink-desktop",
   "productName": "MouseLink Desktop",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Control this computer from your phone",
   "main": "src/main.js",
   "author": "Vynova Labs",
@@ -104,6 +104,7 @@
       "displayName": "MouseLink Desktop",
       "backgroundColor": "transparent",
       "showNameOnTiles": true,
+  
       "languages": [
         "en-US"
       ],

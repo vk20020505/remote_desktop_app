@@ -104,11 +104,18 @@
                 <span class="chip"><svg><use href="#i-monitor"/></svg><span id="hostname">—</span></span>
                 <span class="chip" id="security-chip"><svg><use href="#i-lock"/></svg><span>No password</span></span>
               </div>
-              <ol class="steps">
-                <li><span>1</span>Connect your phone to the same Wi-Fi network.</li>
-                <li><span>2</span>Open the MouseLink mobile app — this computer appears automatically.</li>
-                <li><span>3</span>Not listed? Enter the address above manually.</li>
-              </ol>
+              <p class="other-ips" id="other-ips" hidden></p>
+              <div class="connect-row">
+                <ol class="steps">
+                  <li><span>1</span>Connect your phone to the same Wi-Fi network.</li>
+                  <li><span>2</span>Open the MouseLink mobile app and tap <strong>Scan QR</strong>.</li>
+                  <li><span>3</span>Point it at this code — or pick this computer from the list, or enter the address above.</li>
+                </ol>
+                <div class="qr" id="qr" title="Scan with the MouseLink mobile app">
+                  <img id="qr-img" alt="QR code to connect your phone">
+                  <div class="qr-off">Start the server to connect</div>
+                </div>
+              </div>
             </div>
           </div>
 

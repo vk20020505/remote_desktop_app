@@ -103,7 +103,7 @@ function render(s) {
   $("#hero").classList.toggle("on", on);
   $("#hero-title").textContent = on ? (n ? `${n} device${n > 1 ? "s" : ""} connected` : "Ready to connect") : "Server is off";
   $("#hero-sub").textContent = on
-    ? (n ? "Your phone is in control. Have fun!" : "Open Remote Mouse on your phone to get started.")
+    ? (n ? "Your phone is in control. Have fun!" : "Open MouseLink mobile app on your phone to get started.")
     : "Turn it on to let your phone connect.";
   const btn = $("#toggle-server");
   btn.className = `btn btn-lg ${on ? "btn-danger" : "btn-primary"}`;

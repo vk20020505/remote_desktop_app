@@ -121,7 +121,7 @@ function createWindow() {
     minWidth: 820,
     minHeight: 580,
     show: false,
-    title: "MouseLink",
+    title: "MouseLink Desktop",
     icon: path.join(ASSETS, "icon.png"),
     backgroundColor: IS_MAC ? "#00000000" : nativeTheme.shouldUseDarkColors ? "#0b0d14" : "#f5f6fa",
     ...(IS_MAC && { titleBarStyle: "hiddenInset", vibrancy: "sidebar", visualEffectState: "active", transparent: false }),
@@ -151,7 +151,7 @@ function createWindow() {
     win.hide();
     if (IS_MAC) app.dock.hide();
     if (!trayHintShown && Notification.isSupported()) {
-      new Notification({ title: "Remote Mouse is still running",
+      new Notification({ title: "MouseLink Desktop is still running",
         body: "Your phone stays connected. Use the menu bar / tray icon to open or quit." }).show();
       trayHintShown = true;
     }

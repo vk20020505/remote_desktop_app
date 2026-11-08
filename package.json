@@ -10,7 +10,7 @@
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder",
-    "dist:mac": "electron-builder --mac",
+    "dist:mac": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac",
     "dist:win": "electron-builder --win",
     "dist:msix": "electron-builder --win appx",
     "dist:linux": "electron-builder --linux"

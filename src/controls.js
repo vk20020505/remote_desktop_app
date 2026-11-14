@@ -79,6 +79,24 @@ async function moveBy(dx, dy) {
   await mouse.setPosition(new Point(p.x + dx, p.y + dy));
 }
 
+/**
+ * Puts the pointer at a spot on the primary screen given as fractions (0..1) of its
+ * width and height: what the phone sends when the mirrored screen is tapped.
+ */
+async function moveTo(fx, fy) {
+  const { screen } = require("electron");
+  const { bounds, scaleFactor } = screen.getPrimaryDisplay();
+  const clamp = (v) => Math.min(1, Math.max(0, Number.isFinite(v) ? v : 0));
+  let p = {
+    x: Math.round(bounds.x + clamp(fx) * (bounds.width - 1)),
+    y: Math.round(bounds.y + clamp(fy) * (bounds.height - 1)),
+  };
+  // nut-js uses physical pixels on Windows/Linux and points on macOS; Electron gives DIPs.
+  if (PLATFORM === "win32") p = screen.dipToScreenPoint(p);
+  else if (PLATFORM === "linux") p = { x: Math.round(p.x * scaleFactor), y: Math.round(p.y * scaleFactor) };
+  await mouse.setPosition(new Point(p.x, p.y));
+}
+
 async function scroll(dx, dy) {
   // Positive dy = up, positive dx = right (same as the phone / pynput).
   if (dy > 0) await mouse.scrollUp(dy * SCROLL_UNIT);
@@ -199,6 +217,7 @@ async function handleCommand(cmd, args, reply) {
   switch (cmd) {
     case "PING": reply("PONG"); break;
     case "MOVE": await moveBy(parseInt(args[0], 10) || 0, parseInt(args[1], 10) || 0); break;
+    case "MOVE_TO": await moveTo(parseFloat(args[0]), parseFloat(args[1])); break;
     case "CLICK_LEFT": await mouse.click(Button.LEFT); break;
     case "CLICK_RIGHT": await mouse.click(Button.RIGHT); break;
     case "CLICK_MIDDLE": await mouse.click(Button.MIDDLE); break;

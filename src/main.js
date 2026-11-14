@@ -8,6 +8,7 @@ const {
 const QRCode = require("qrcode");
 const { RemoteServer, getLocalIp, listLocalIps, DEFAULT_PORT } = require("./server");
 const { OS_NAME } = require("./controls");
+const { ScreenMirror } = require("./mirror");
 
 const IS_MAC = process.platform === "darwin";
 const IS_WIN = process.platform === "win32";
@@ -78,6 +79,7 @@ function state() {
     platform: process.platform,
     version: app.getVersion(),
     clients: server.clients(),
+    mirroring: mirror ? mirror.watching : 0, // phones currently watching the screen
     logs: logs.slice(-200),
     settings,
     accessibility: accessibilityGranted(),
@@ -99,6 +101,13 @@ function log(message) {
 server.on("state", pushState);
 server.on("clients", pushState);
 server.on("log", log);
+
+// Created once the app is ready (it registers IPC handlers and opens a hidden window).
+let mirror = null;
+server.on("mirror", (m) => {
+  if (mirror) mirror.handle(m);
+  else m.reply(`MIRROR_FAIL ${Buffer.from("The desktop app is still starting.").toString("base64")}`);
+});
 
 async function startServer() {
   try {
@@ -156,7 +165,11 @@ function createWindow() {
       trayHintShown = true;
     }
   });
-  win.on("closed", () => { win = null; });
+  win.on("closed", () => {
+    win = null;
+    // The hidden screen-capture window would otherwise keep the app alive.
+    if (!settings.closeToTray && !quitting) app.quit();
+  });
 }
 
 function titleBarOverlay() {
@@ -250,6 +263,10 @@ if (!app.requestSingleInstanceLock()) {
       if (IS_WIN && win) win.setTitleBarOverlay(titleBarOverlay());
     });
 
+    mirror = new ScreenMirror();
+    mirror.on("log", log);
+    mirror.on("change", pushState);
+
     createTray();
     createWindow();
     if (settings.autostart) await startServer();
@@ -259,7 +276,11 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.on("activate", showWindow); // macOS: click on the Dock icon
-  app.on("before-quit", () => { quitting = true; server.stop(); });
+  app.on("before-quit", () => {
+    quitting = true;
+    if (mirror) mirror.stopAll();
+    server.stop();
+  });
   app.on("window-all-closed", () => {
     if (!settings.closeToTray) app.quit();
   });

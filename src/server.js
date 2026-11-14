@@ -180,6 +180,7 @@ class RemoteServer extends EventEmitter {
     socket.on("close", () => {
       this._clients.delete(id);
       this._emitClients();
+      this.emit("mirror", { cmd: "MIRROR_STOP", args: [], clientId: id, ip: info.ip, reply: () => {} });
       this.emit("log", `${info.ip} disconnected`);
     });
   }
@@ -195,6 +196,11 @@ class RemoteServer extends EventEmitter {
         continue;
       }
       if (!info.authed && cmd !== "PING") continue;
+      if (cmd.startsWith("MIRROR_")) {
+        // Screen mirroring signaling; ScreenMirror (mirror.js) answers through `reply`.
+        this.emit("mirror", { cmd, args, clientId: info.id, ip: info.ip, reply });
+        continue;
+      }
       try {
         this.commandCount++;
         const note = await handleCommand(cmd, args, reply);
